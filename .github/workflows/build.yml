@@ -1,0 +1,47 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore GitHubAccountManager.sln
+      - run: dotnet build GitHubAccountManager.sln -c Release --no-restore
+      - run: dotnet test tests/GitHubAccountManager.Tests/GitHubAccountManager.Tests.csproj -c Release --no-build --collect:"XPlat Code Coverage"
+      - run: dotnet publish src/GitHubAccountManager.App/GitHubAccountManager.App.csproj -c Release --no-restore
+      - shell: pwsh
+        run: |
+          $hash = Get-FileHash dist/GitHubAccountManager.exe -Algorithm SHA256
+          "{0}  GitHubAccountManager.exe" -f $hash.Hash.ToLowerInvariant() | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GitHubAccountManager-win-x64
+          path: |
+            dist/GitHubAccountManager.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: GitHubAccountManager-win-x64
+          path: release
+      - run: gh release create "$GITHUB_REF_NAME" release/GitHubAccountManager.exe release/SHA256SUMS.txt --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "language": "en",
+  "remoteName": "origin",
+  "networkTimeoutSeconds": 30,
+  "backupRetention": 20,
+  "accounts": [
+    {
+      "id": "personal",
+      "displayName": "Personal",
+      "gitUserName": "Your Name",
+      "gitEmail": "you@example.com",
+      "gitHubUser": "your-github-user",
+      "hostName": "github.com",
+      "sshAlias": "github-personal",
+      "privateKeyPath": "~/.ssh/github-personal",
+      "signingKeyPath": "~/.ssh/github-personal.pub",
+      "enableCommitSigning": false
+    }
+  ]
+}

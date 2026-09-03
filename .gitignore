@@ -1,0 +1,22 @@
+# Build output
+**/bin/
+**/obj/
+TestResults/
+dist/
+.dotnet-cli/
+
+# IDE and user state
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+
+# Secrets and keys
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+logs/
